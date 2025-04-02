@@ -24,6 +24,7 @@ document.addEventListener('mousedown', (event) => {
     if (event.button === 0) { // Left mouse button
         isLeftMouseDown = true;
         leftMouseDownTime = currentTime;
+        hasLoggedLeftHold = false; // Reset hold flag on new press
         
         // Check for simultaneous press
         if (isRightMouseDown && !hasLoggedSimultaneousPress) {
@@ -34,6 +35,7 @@ document.addEventListener('mousedown', (event) => {
     } else if (event.button === 2) { // Right mouse button
         isRightMouseDown = true;
         rightMouseDownTime = currentTime;
+        hasLoggedRightHold = false; // Reset hold flag on new press
         
         // Check for simultaneous press
         if (isLeftMouseDown && !hasLoggedSimultaneousPress) {
@@ -71,6 +73,7 @@ document.addEventListener('mouseup', (event) => {
     // Reset simultaneous press flag if both buttons are released
     if (!isLeftMouseDown && !isRightMouseDown) {
         hasLoggedSimultaneousPress = false;
+        hasLoggedBothHold = false;
         if (currentTime - bothMouseDownTime >= 1000 && hasLoggedBothHold) {
             console.log('Both buttons released after 1 second');
         }

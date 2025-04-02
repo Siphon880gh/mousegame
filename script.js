@@ -1,9 +1,9 @@
-
 // Note - No simultaneous LMB and RMB detection because MacOS doesn't support it
 /**
  * @typedef {Object} MouseGameAPIOptions
- * @property {boolean} [enableDoubleLmb=true] - Enable double left mouse button detection
- * @property {boolean} [enableDoubleRmb=true] - Enable double right mouse button detection
+ * @property {boolean} [enabledLmbToLmbCombo=true] - Enable double left mouse button detection
+ * @property {boolean} [enabledRmbToRmbCombo=true] - Enable double right mouse button detection
+ * @property {function} [checkEnabled] - Optional function that runs before processing any mouse event. Should return boolean. If returns false, no mouse events will be processed.
  * @property {function} [onLeftTap] - Handler for left mouse button tap
  * @property {function} [onRightTap] - Handler for right mouse button tap
  * @property {function} [onLeftHold] - Handler for left mouse button hold (1 second)
@@ -21,8 +21,9 @@ class MouseGameAPI {
     constructor(options = {}) {
         // Configuration options
         this.config = {
-            enableDoubleLmb: options.enableDoubleLmb || true,
-            enableDoubleRmb: options.enableDoubleRmb || true
+            enabledLmbToLmbCombo: options.enabledLmbToLmbCombo || true,
+            enabledRmbToRmbCombo: options.enabledRmbToRmbCombo || true,
+            checkEnabled: options.checkEnabled || (() => true)
         };
 
         // Default callbacks
@@ -79,6 +80,11 @@ class MouseGameAPI {
     }
 
     handleMouseDown(event) {
+        // Run checkEnabled before processing any mouse events
+        if (!this.config.checkEnabled()) {
+            return;
+        }
+
         const currentTime = Date.now();
         
         if (event.button === 0) { // Left mouse button
@@ -93,7 +99,7 @@ class MouseGameAPI {
                 this.bothMouseDownTime = currentTime;
             }
             // Check for LMB -> LMB combo (double click)
-            else if (this.config.enableDoubleLmb && 
+            else if (this.config.enabledLmbToLmbCombo && 
                     this.lastButtonPressed === 'left' && 
                     currentTime - this.lastButtonPressTime < this.COMBO_WINDOW) {
                 this.callbacks.onLmbToLmbCombo(currentTime - this.lastButtonPressTime);
@@ -112,7 +118,7 @@ class MouseGameAPI {
                 this.bothMouseDownTime = currentTime;
             }
             // Check for RMB -> RMB combo (double click)
-            else if (this.config.enableDoubleRmb && 
+            else if (this.config.enabledRmbToRmbCombo && 
                     this.lastButtonPressed === 'right' && 
                     currentTime - this.lastButtonPressTime < this.COMBO_WINDOW) {
                 this.callbacks.onRmbToRmbCombo(currentTime - this.lastButtonPressTime);
@@ -123,6 +129,11 @@ class MouseGameAPI {
     }
 
     handleMouseUp(event) {
+        // Run checkEnabled before processing any mouse events
+        if (!this.config.checkEnabled()) {
+            return;
+        }
+
         const currentTime = Date.now();
         
         if (event.button === 0) { // Left mouse button
@@ -152,6 +163,11 @@ class MouseGameAPI {
     }
 
     checkHolds() {
+        // Run checkEnabled before processing any mouse events
+        if (!this.config.checkEnabled()) {
+            return;
+        }
+
         const currentTime = Date.now();
         
         if (this.isLeftMouseDown && !this.isRightMouseDown && 
@@ -176,16 +192,24 @@ class MouseGameAPI {
 
 // Example usage:
 // const mouseGame = new MouseGameAPI({
-//     enableDoubleLmb: true,
-//     enableDoubleRmb: true,
+//    // Overrides console log for LMB→LMB combo and RMB→RMB combo with your own custom handler
+//    onLmbToLmbCombo: (time) => console.log(`%cCustom LMB→LMB combo: ${time}ms`, 'color: #00FF00;'),
+//    onRmbToRmbCombo: (time) => console.log(`%cCustom RMB→RMB combo: ${time}ms`, 'color: #FF00FF;')
+// });
+// const mouseGame = new MouseGameAPI({
 //     onLmbToLmbCombo: (time) => console.log(`%cCustom LMB→LMB combo: ${time}ms`, 'color: #00FF00;'),
 //     onRmbToRmbCombo: (time) => console.log(`%cCustom RMB→RMB combo: ${time}ms`, 'color: #FF00FF;')
 // });
+// const mouseGame = new MouseGameAPI({
+//     enabledLmbToLmbCombo: false,
+//     enabledRmbToRmbCombo: false,
+// });
+
 const mouseGame = new MouseGameAPI({
-    // enableDoubleLmb: false,
-    // enableDoubleRmb: false,
-    // onLmbToLmbCombo: (time) => console.log(`%cCustom LMB→LMB combo: ${time}ms`, 'color: #00FF00;'),
-    // onRmbToRmbCombo: (time) => console.log(`%cCustom RMB→RMB combo: ${time}ms`, 'color: #FF00FF;')
+    checkEnabled: () => {
+        // Example: only allow mouse events when a certain condition is met
+        return document.body.classList.contains('mouse-events-enabled');
+    },
 });
 
 // Initialize the game

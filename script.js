@@ -30,14 +30,6 @@ document.addEventListener('mousedown', (event) => {
             console.log('LMB and RMB pressed simultaneously');
             hasLoggedSimultaneousPress = true;
             bothMouseDownTime = currentTime;
-        } else if (!isRightMouseDown) {
-            // Set a timeout to check if it's a quick press
-            leftPressTimeout = setTimeout(() => {
-                // Only log if it's a quick press (button released within 150ms)
-                if (!isLeftMouseDown && !hasLoggedLeftHold) {
-                    console.log('LMB pressed');
-                }
-            }, 150); // Wait 150ms to see if it's a quick press
         }
     } else if (event.button === 2) { // Right mouse button
         isRightMouseDown = true;
@@ -48,14 +40,6 @@ document.addEventListener('mousedown', (event) => {
             console.log('LMB and RMB pressed simultaneously');
             hasLoggedSimultaneousPress = true;
             bothMouseDownTime = currentTime;
-        } else if (!isLeftMouseDown) {
-            // Set a timeout to check if it's a quick press
-            rightPressTimeout = setTimeout(() => {
-                // Only log if it's a quick press (button released within 150ms)
-                if (!isRightMouseDown && !hasLoggedRightHold) {
-                    console.log('RMB pressed');
-                }
-            }, 150); // Wait 150ms to see if it's a quick press
         }
     }
 });
@@ -66,20 +50,18 @@ document.addEventListener('mouseup', (event) => {
     
     if (event.button === 0) { // Left mouse button
         isLeftMouseDown = false;
-        // Clear the press timeout if it exists
-        if (leftPressTimeout) {
-            clearTimeout(leftPressTimeout);
-            leftPressTimeout = null;
+        // Check if it was a quick press
+        if (!hasLoggedLeftHold && currentTime - leftMouseDownTime < 150) {
+            console.log('LMB pressed');
         }
         if (currentTime - leftMouseDownTime >= 1000 && hasLoggedLeftHold) {
             console.log('LMB released after 1 second');
         }
     } else if (event.button === 2) { // Right mouse button
         isRightMouseDown = false;
-        // Clear the press timeout if it exists
-        if (rightPressTimeout) {
-            clearTimeout(rightPressTimeout);
-            rightPressTimeout = null;
+        // Check if it was a quick press
+        if (!hasLoggedRightHold && currentTime - rightMouseDownTime < 150) {
+            console.log('RMB pressed');
         }
         if (currentTime - rightMouseDownTime >= 1000 && hasLoggedRightHold) {
             console.log('RMB released after 1 second');
@@ -104,11 +86,6 @@ setInterval(() => {
         currentTime - leftMouseDownTime >= 1000 && !hasLoggedLeftHold) {
         console.log('LMB held for 1 second');
         hasLoggedLeftHold = true;
-        // Clear the press timeout if it exists
-        if (leftPressTimeout) {
-            clearTimeout(leftPressTimeout);
-            leftPressTimeout = null;
-        }
     }
     
     // Check RMB hold
@@ -116,11 +93,6 @@ setInterval(() => {
         currentTime - rightMouseDownTime >= 1000 && !hasLoggedRightHold) {
         console.log('RMB held for 1 second');
         hasLoggedRightHold = true;
-        // Clear the press timeout if it exists
-        if (rightPressTimeout) {
-            clearTimeout(rightPressTimeout);
-            rightPressTimeout = null;
-        }
     }
     
     // Check simultaneous hold

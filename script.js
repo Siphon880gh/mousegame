@@ -27,7 +27,7 @@ document.addEventListener('mousedown', (event) => {
         
         // Check for simultaneous press
         if (isRightMouseDown && !hasLoggedSimultaneousPress) {
-            console.log('LMB and RMB pressed simultaneously');
+            console.log('LMB and RMB tapped simultaneously');
             hasLoggedSimultaneousPress = true;
             bothMouseDownTime = currentTime;
         }
@@ -37,7 +37,7 @@ document.addEventListener('mousedown', (event) => {
         
         // Check for simultaneous press
         if (isLeftMouseDown && !hasLoggedSimultaneousPress) {
-            console.log('LMB and RMB pressed simultaneously');
+            console.log('LMB and RMB tapped simultaneously');
             hasLoggedSimultaneousPress = true;
             bothMouseDownTime = currentTime;
         }
@@ -52,7 +52,7 @@ document.addEventListener('mouseup', (event) => {
         isLeftMouseDown = false;
         // Check if it was a quick press
         if (!hasLoggedLeftHold && currentTime - leftMouseDownTime < 150) {
-            console.log('LMB pressed');
+            console.log('LMB tapped');
         }
         if (currentTime - leftMouseDownTime >= 1000 && hasLoggedLeftHold) {
             console.log('LMB released after 1 second');
@@ -61,7 +61,7 @@ document.addEventListener('mouseup', (event) => {
         isRightMouseDown = false;
         // Check if it was a quick press
         if (!hasLoggedRightHold && currentTime - rightMouseDownTime < 150) {
-            console.log('RMB pressed');
+            console.log('RMB tapped');
         }
         if (currentTime - rightMouseDownTime >= 1000 && hasLoggedRightHold) {
             console.log('RMB released after 1 second');

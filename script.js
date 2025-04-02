@@ -1,4 +1,5 @@
 
+// Note - No simultaneous LMB and RMB detection because MacOS doesn't support it
 /**
  * @typedef {Object} MouseGameAPIOptions
  * @property {boolean} [enableDoubleLmb=true] - Enable double left mouse button detection

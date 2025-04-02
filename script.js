@@ -13,6 +13,11 @@ let hasLoggedLeftHold = false;
 let hasLoggedRightHold = false;
 let hasLoggedBothHold = false;
 
+// Track last button press for combo detection
+let lastButtonPressed = null;
+let lastButtonPressTime = 0;
+const COMBO_WINDOW = 400; // Time window for combo detection in milliseconds
+
 // Track pending press events
 let leftPressTimeout = null;
 let rightPressTimeout = null;
@@ -24,25 +29,33 @@ document.addEventListener('mousedown', (event) => {
     if (event.button === 0) { // Left mouse button
         isLeftMouseDown = true;
         leftMouseDownTime = currentTime;
-        hasLoggedLeftHold = false; // Reset hold flag on new press
-        
-        // Check for simultaneous press
-        if (isRightMouseDown && !hasLoggedSimultaneousPress) {
-            console.log('LMB and RMB tapped simultaneously');
+        hasLoggedLeftHold = false;
+
+        // Check for RMB -> LMB combo
+        if (lastButtonPressed === 'right' && 
+            currentTime - lastButtonPressTime < COMBO_WINDOW) {
+            console.log(`%cRMB then LMB combo detected (${currentTime - lastButtonPressTime}ms)`, 'color: #0000FF;');
             hasLoggedSimultaneousPress = true;
             bothMouseDownTime = currentTime;
         }
+        lastButtonPressed = 'left';
+        lastButtonPressTime = currentTime;
+        console.log('LMB pressed, waiting for possible combo...');
     } else if (event.button === 2) { // Right mouse button
         isRightMouseDown = true;
         rightMouseDownTime = currentTime;
-        hasLoggedRightHold = false; // Reset hold flag on new press
-        
-        // Check for simultaneous press
-        if (isLeftMouseDown && !hasLoggedSimultaneousPress) {
-            console.log('LMB and RMB tapped simultaneously');
+        hasLoggedRightHold = false;
+
+        // Check for LMB -> RMB combo
+        if (lastButtonPressed === 'left' && 
+            currentTime - lastButtonPressTime < COMBO_WINDOW) {
+            console.log(`%cLMB then RMB combo detected (${currentTime - lastButtonPressTime}ms)`, 'color: #FF0000;' );
             hasLoggedSimultaneousPress = true;
             bothMouseDownTime = currentTime;
         }
+        lastButtonPressed = 'right';
+        lastButtonPressTime = currentTime;
+        console.log('RMB pressed, waiting for possible combo...');
     }
 });
 
@@ -70,10 +83,11 @@ document.addEventListener('mouseup', (event) => {
         }
     }
     
-    // Reset simultaneous press flag if both buttons are released
+    // Only reset combo tracking if both buttons are released
     if (!isLeftMouseDown && !isRightMouseDown) {
         hasLoggedSimultaneousPress = false;
         hasLoggedBothHold = false;
+        // Don't reset lastButtonPressed and lastButtonPressTime here
         if (currentTime - bothMouseDownTime >= 1000 && hasLoggedBothHold) {
             console.log('Both buttons released after 1 second');
         }

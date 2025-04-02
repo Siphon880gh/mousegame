@@ -9,11 +9,23 @@ By Weng Fei Fung.
 
 This engine is useful for creating web games or interfaces where you need to destinguish single clicks on the left mouse button (LMB) or right mouse button (RMB), or to execute code when user holds the mouse click (LMB or RMB) for some time, or to execute that code when the user releases that mouse holding. It can also detect if the user clicks in quick succession RMB -> LMB or RMB -> LMB. 
 
-Engine in action at DevTools console:
+## Engine in action at DevTools console:
 
 ![](Readme/engine-example.png)
 
-Sometimes you don't want to detect quick succession of the same button (eg. LMB->LMB, or RMB->RMB) because those clicks each executes the same code (Eg. spamming woodchopping in a game). Disable the double click events with:
+## Usage
+
+Simply initiate a new instance:
+```
+const mouseGame = new MouseGameAPI();
+
+// Initialize the game
+mouseGame.init();
+```
+
+MouseGameAPI can receive optional settings object.
+
+For example, sometimes you don't want to detect quick succession of the same button (eg. LMB->LMB, or RMB->RMB) because those clicks each executes the same code (Eg. spamming woodchopping in a game). Disable the double click events with:
 ```
 const mouseGame = new MouseGameAPI({
      enabledLmbToLmbCombo: false,
@@ -51,3 +63,9 @@ const mouseGame = new MouseGameAPI({
 ^ In this example, if the `<body>` element has the class `mouse-events-enabled`, then the mouse event engine is ON. You can have JS that removes/adds this class for a more dynamic use case.
 
 If you have different mouse event handlers for different parts of your app or game, you could initiate different instances of MouseGameAPI each with checkEnabled that passes true when appropriate.
+
+## Complied with Apple Mac Limitations
+
+Mac has a serious limitation where if you press both LMB and RMB, it cannot detect that both are being pressed. The reason why is that Apple never cared to adapt their mouse events to the mouse. The Mac trackpad is either one click for LMB or two finger click for RMB.
+
+Therefore, our code does not have simultaneous LMB and RMB detection. If you choose to edit the engine to implement the simultaneous event, you should warn your users or game players that Mac is not supported.

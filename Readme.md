@@ -120,6 +120,27 @@ Holding either the LMB or the RMB doesn’t trigger the “holding” event unti
 
 ---
 
+## Advanced Patterns
+
+By combining custom handlers with global flags in your app, you can have more complex mouse to trigger behaviors.
+
+### Clean Combo Event
+
+If your use case doesn’t require rapid-fire actions from spamming the left mouse button (LMB), you can distinguish between a single click and a combo click, triggering only one of the two events—instead of firing a click event, a combo event, and possibly another click event, when you click in a quick succession of either LMB then RMB, or RMB then LMB. Console log looking like:
+```
+LMB tapped
+engine.js:45 LMB then RMB combo detected (149ms)
+engine.js:37 RMB tapped
+```
+
+You want only:
+```
+engine.js:45 LMB then RMB combo detected (149ms)
+```
+
+To do this, use a global flag to manage LMB clicks. Set the flag to true when LMB is clicked. Then, after a timeout (e.g., your desired threshold plus 100ms), check if the flag is still true. If so, execute the single-click action. In either case, reset the flag to false. If the user clicks LMB followed by the right mouse button (RMB), trigger the combo action immediately and reset the flag.
+
+This requires adding a threshold to detect the succession and to trigger the click event if no second click detected within the threshold. This means it is not suitable for games or apps that allow user to spam the LMB (or the RMB) to perform a series of actions (eg. Having a unit perform more rapid woodchopping in a RTS game)
 
 ## Complied with Apple Mac Limitations
 

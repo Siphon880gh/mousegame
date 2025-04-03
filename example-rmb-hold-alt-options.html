@@ -6,15 +6,51 @@
 
     <title>Mouse Engine API Example</title>
     <link rel="stylesheet" href="index.css">
+    <style>
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li::before {
+            content: "•";
+            color: maroon;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        #alternate-actions-hint:not(.visible) {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Mouse Engine API Example: <u>General</u></h1>
+        <h1>Mouse Engine API Example: <u>Alternate Actions</u></h1>
         <p>Open DevTools console, then perform different mouse clicks on this webpage to see the output.</p>
-        <p><b>Coming soon!</b> For now, this example is the same as the general example.</p>
+        <p>Expected behaviors:</p>
+        <ul>
+            <li>Single left click will console log LMB default action.</li>
+            <li>Single right click will console log RMB default action.</li>
+            <li>Holding RMB will show the alternate actions message. Release the RMB.</li>
+            <li>Single left click will console log LMB alternate action 1. Alternate actions message closes.</li>
+            <li>OR: Single right click will console log RMB alternate action 2. Alternate actions message closes.</li>
+            <li>Alternate actions are only possible when the alternate actions message is visible. Hold RMB to cancel the alternate actions message if prefer to perform neither alternate actions.</li>
+        </ul>
+    </div>
+
+    <div id="alternate-actions-hint" style="position:fixed; bottom:0; left:0; width:100%;">
+        <div style="width: fit-content;background-color: lightyellow; color:maroon; padding:30px 60px; margin:30px auto;border:1px solid rgba(155, 20, 20, 1); border-radius:10px; font-size:1.2rem; text-align:center;">
+            <div style="font-weight:bold;">Alternate actions available</div>
+            <i style="font-weight:light; opacity:0.6; font-size:90%;">Press and hold RMB again to return to normal actions.</i>
+            <ul>
+                <li>LMB for alternate action 1</li>
+                <li>RMB for alternate action 2</li>
+                <li>Hold RMB then release to cancel (neither actions will be performed)</li>
+            </ul>
+        </div>
     </div>
 
     <script src="engine.js"></script>
-    <script src="example-general.js"></script>
+    <script src="example-rmb-hold-alt-options.js"></script>
 </body>
 </html>

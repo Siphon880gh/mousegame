@@ -22,9 +22,7 @@
 // });
 
 // Initialize the game
-const mouseGame = new MouseGameAPI({
-    comboThreshold: 2000
-});
+const mouseGame = new MouseGameAPI();
 mouseGame.init();
 
 // To destroy/cleanup:

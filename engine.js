@@ -12,10 +12,8 @@
  * @property {() => void} [onRightTap] - Handler for right mouse button tap
  * @property {() => void} [onLeftHold] - Handler for left mouse button hold (1 second)
  * @property {() => void} [onRightHold] - Handler for right mouse button hold (1 second)
- * @property {() => void} [onBothHold] - Handler for both mouse buttons held (1 second)
  * @property {() => void} [onLeftRelease] - Handler for left mouse button release after hold
  * @property {() => void} [onRightRelease] - Handler for right mouse button release after hold
- * @property {() => void} [onBothRelease] - Handler for both buttons release after hold
  * @property {() => void} [onRmbToLmbCombo] - Handler for right-to-left mouse button combo
  * @property {() => void} [onLmbToRmbCombo] - Handler for left-to-right mouse button combo
  * @property {() => void} [onLmbToLmbCombo] - Handler for double left mouse button combo
@@ -37,10 +35,8 @@ class MouseGameAPI {
             onRightTap: options.onRightTap || (() => console.log('RMB tapped')),
             onLeftHold: options.onLeftHold || (() => console.log(`LMB held for ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
             onRightHold: options.onRightHold || (() => console.log(`RMB held for ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
-            onBothHold: options.onBothHold || (() => console.log(`buttons held for ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
             onLeftRelease: options.onLeftRelease || (() => console.log(`LMB released after ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
             onRightRelease: options.onRightRelease || (() => console.log(`RMB released after ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
-            onBothRelease: options.onBothRelease || (() => console.log(`buttons released after ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
             onRmbToLmbCombo: options.onRmbToLmbCombo || ((time) => console.log(`%cRMB then LMB combo detected (${time}ms)`, 'color: #FF0000; font-weight:bold;')),
             onLmbToRmbCombo: options.onLmbToRmbCombo || ((time) => console.log(`%cLMB then RMB combo detected (${time}ms)`, 'color: #0000FF; font-weight:bold;')),
             onLmbToLmbCombo: options.onLmbToLmbCombo || ((time) => console.log(`%cLMB then LMB combo detected (${time}ms)`, 'color: #000000; background-color: #FFFFFF; font-weight:bold;')),
@@ -159,13 +155,6 @@ class MouseGameAPI {
                 this.callbacks.onRightRelease();
             }
         }
-        
-        if (!this.isLeftMouseDown && !this.isRightMouseDown) {
-            this.hasLoggedBothHold = false;
-            if (currentTime - this.bothMouseDownTime >= this.HOLD_WINDOW && this.hasLoggedBothHold) {
-                this.callbacks.onBothRelease();
-            }
-        }
     }
 
     checkHolds() {
@@ -188,11 +177,6 @@ class MouseGameAPI {
             this.hasLoggedRightHold = true;
         }
         
-        if (this.isLeftMouseDown && this.isRightMouseDown && 
-            currentTime - this.bothMouseDownTime >= this.HOLD_WINDOW && !this.hasLoggedBothHold) {
-            this.callbacks.onBothHold();
-            this.hasLoggedBothHold = true;
-        }
     }
 }
 

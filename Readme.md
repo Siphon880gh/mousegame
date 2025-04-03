@@ -11,7 +11,7 @@ This engine is useful for creating web games or interfaces where you need to des
 
 ## Engine in action at DevTools console:
 
-![](Readme/engine-example.png)
+![](Readme/example-general.png)
 
 ## Usage
 
@@ -40,10 +40,8 @@ You can provide custom handlers for each mouse event. That would remove the cons
  * @property {function} [onRightTap] - Handler for right mouse button tap
  * @property {function} [onLeftHold] - Handler for left mouse button hold (1 second)
  * @property {function} [onRightHold] - Handler for right mouse button hold (1 second)
- * @property {function} [onBothHold] - Handler for both mouse buttons held (1 second)
  * @property {function} [onLeftRelease] - Handler for left mouse button release after hold
  * @property {function} [onRightRelease] - Handler for right mouse button release after hold
- * @property {function} [onBothRelease] - Handler for both buttons release after hold
  * @property {function} [onRmbToLmbCombo] - Handler for right-to-left mouse button combo
  * @property {function} [onLmbToRmbCombo] - Handler for left-to-right mouse button combo
  * @property {function} [onLmbToLmbCombo] - Handler for double left mouse button combo
@@ -147,6 +145,29 @@ This requires adding a threshold to detect the succession and to trigger the cli
 When the LMB->RMB event triggers, the RMB click event also triggers usually right after. So during the LMB->RMB event, you should set a global flag for LMB->RMB having occured. At the RMB event handler, check if this flag exists:
 - If the flag is true, do not execute RMB action. However, do reset the flag back to false.
 - If the flag is false, execute the RMB action as usual.
+
+### Alternate group of mouse events
+
+If your use case requires more mouse actions, you can designatre a RMB hold-then-release as a way to enter the alternate mouse menu. When alernate mode is on, you would have your app display instructions to LMB for alternate action 1 or RMB for alternate action 2 or hold RMB again to cancel and return to the normal mouse click actions. Your logic and flags can be as follows:
+
+Create a function that turns this box on and off:
+![](Readme/alternate-actions-example.png)
+
+- The code could look like example-rmb-hold-alt-options.js':
+```
+function toggleAlternateActionsHint() {
+    const alternateActionsHintElement = document.getElementById("alternate-actions-hint");
+    alternateActionsHintElement.classList.toggle("visible");
+}
+```
+
+When user holds RMB, show alternate actions message and also set flag isRmbHeld to true
+
+On LMB or RMB click, check if isRmbHeld flag is true. 
+- If true, perform alternate action and dismiss the alternate actions message.
+- If false, perform default action.
+
+If instead, user holds RMB and then releases again, set isRmbHeld to false and dismiss the alternate actions message. This is considered a cancel.
 
 ## Complied with Apple Mac Limitations
 

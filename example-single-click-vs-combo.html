@@ -4,17 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Mouse Game API Example</title>
+    <title>Mouse Engine API Example</title>
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
     <div class="container">
-        <h1>Mouse Game API Example: <u>General</u></h1>
+        <h1>Mouse Engine API Example: <u>General</u></h1>
         <p>Open DevTools console, then perform different mouse clicks on this webpage to see the output.</p>
-        <p><b>Coming soon!</b> For now, this example is the same as the general example.</p>
+        <p>Expected behaviors:</p>
+        <ul>
+            <li>Single left click will console log "LMB tapped" but there's a slight delay before that will output.</li>
+            <li>Single right click will console log "RMB tapped"</li>
+            <li>Left click followed by right click within 350ms will console log "LMB then RMB combo detected".</li>
+        </ul>
     </div>
 
     <script src="engine.js"></script>
-    <script src="example-general.js"></script>
+    <script src="example-single-click-vs-combo.js"></script>
 </body>
 </html>

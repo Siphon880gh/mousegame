@@ -138,9 +138,15 @@ You want only:
 engine.js:45 LMB then RMB combo detected (149ms)
 ```
 
-To do this, use a global flag to manage LMB clicks. Set the flag to true when LMB is clicked. Then, after a timeout (e.g., your desired threshold plus 100ms), check if the flag is still true. If so, execute the single-click action. In either case, reset the flag to false. If the user clicks LMB followed by the right mouse button (RMB), trigger the combo action immediately and reset the flag.
+To do this, use a global flag to manage LMB clicks. Set the flag to true when LMB is clicked. Then, after a timeout (e.g., your desired threshold plus 100ms), check if the flag is still true. 
+- If so, execute the single-click action. In either case, reset the flag to false. 
+- If the user clicks LMB followed by the right mouse button (RMB), trigger the combo action immediately and reset the flag.
 
-This requires adding a threshold to detect the succession and to trigger the click event if no second click detected within the threshold. This means it is not suitable for games or apps that allow user to spam the LMB (or the RMB) to perform a series of actions (eg. Having a unit perform more rapid woodchopping in a RTS game)
+This requires adding a threshold to detect the succession and to trigger the click event if no second click detected within the threshold. This means it is not suitable for games or apps that allow user to spam the LMB (or the RMB) to perform a series of actions (eg. Having a unit perform more rapid woodchopping in a RTS game). Another side effect is that the action for the user clicking the LMB is delayed because it waits to check if a RMB gets clicked.
+
+When the LMB->RMB event triggers, the RMB click event also triggers usually right after. So during the LMB->RMB event, you should set a global flag for LMB->RMB having occured. At the RMB event handler, check if this flag exists:
+- If the flag is true, do not execute RMB action. However, do reset the flag back to false.
+- If the flag is false, execute the RMB action as usual.
 
 ## Complied with Apple Mac Limitations
 

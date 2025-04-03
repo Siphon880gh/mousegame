@@ -3,20 +3,25 @@
  * @typedef {Object} MouseGameAPIOptions
  * @property {boolean} [enabledLmbToLmbCombo=true] - Enable double left mouse button detection
  * @property {boolean} [enabledRmbToRmbCombo=true] - Enable double right mouse button detection
- * @property {function} [checkEnabled] - Optional function that runs before processing any mouse event. Should return boolean. If returns false, no mouse events will be processed.
- * @property {function} [onLeftTap] - Handler for left mouse button tap
- * @property {function} [onRightTap] - Handler for right mouse button tap
- * @property {function} [onLeftHold] - Handler for left mouse button hold (1 second)
- * @property {function} [onRightHold] - Handler for right mouse button hold (1 second)
- * @property {function} [onBothHold] - Handler for both mouse buttons held (1 second)
- * @property {function} [onLeftRelease] - Handler for left mouse button release after hold
- * @property {function} [onRightRelease] - Handler for right mouse button release after hold
- * @property {function} [onBothRelease] - Handler for both buttons release after hold
- * @property {function} [onRmbToLmbCombo] - Handler for right-to-left mouse button combo
- * @property {function} [onLmbToRmbCombo] - Handler for left-to-right mouse button combo
- * @property {function} [onLmbToLmbCombo] - Handler for double left mouse button combo
- * @property {function} [onRmbToRmbCombo] - Handler for double right mouse button combo
+ * @property {number} [comboThreshold=350] - Time window for combo detection (ms)
+ * @property {number} [holdThreshold=1000] - Time window for hold or hold-then-release detection (ms)
+ * 
+ * @property {() => boolean} [checkEnabled] - Optional function that runs before processing any mouse event. If false, no mouse events will be processed.
+ * 
+ * @property {() => void} [onLeftTap] - Handler for left mouse button tap
+ * @property {() => void} [onRightTap] - Handler for right mouse button tap
+ * @property {() => void} [onLeftHold] - Handler for left mouse button hold (1 second)
+ * @property {() => void} [onRightHold] - Handler for right mouse button hold (1 second)
+ * @property {() => void} [onBothHold] - Handler for both mouse buttons held (1 second)
+ * @property {() => void} [onLeftRelease] - Handler for left mouse button release after hold
+ * @property {() => void} [onRightRelease] - Handler for right mouse button release after hold
+ * @property {() => void} [onBothRelease] - Handler for both buttons release after hold
+ * @property {() => void} [onRmbToLmbCombo] - Handler for right-to-left mouse button combo
+ * @property {() => void} [onLmbToRmbCombo] - Handler for left-to-right mouse button combo
+ * @property {() => void} [onLmbToLmbCombo] - Handler for double left mouse button combo
+ * @property {() => void} [onRmbToRmbCombo] - Handler for double right mouse button combo
  */
+
 class MouseGameAPI {
     constructor(options = {}) {
         // Configuration options
@@ -30,12 +35,12 @@ class MouseGameAPI {
         this.callbacks = {
             onLeftTap: options.onLeftTap || (() => console.log('LMB tapped')),
             onRightTap: options.onRightTap || (() => console.log('RMB tapped')),
-            onLeftHold: options.onLeftHold || (() => console.log('LMB held for 1 second')),
-            onRightHold: options.onRightHold || (() => console.log('RMB held for 1 second')),
-            onBothHold: options.onBothHold || (() => console.log('Both buttons held for 1 second')),
-            onLeftRelease: options.onLeftRelease || (() => console.log('LMB released after 1 second')),
-            onRightRelease: options.onRightRelease || (() => console.log('RMB released after 1 second')),
-            onBothRelease: options.onBothRelease || (() => console.log('Both buttons released after 1 second')),
+            onLeftHold: options.onLeftHold || (() => console.log(`LMB held for ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
+            onRightHold: options.onRightHold || (() => console.log(`RMB held for ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
+            onBothHold: options.onBothHold || (() => console.log(`buttons held for ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
+            onLeftRelease: options.onLeftRelease || (() => console.log(`LMB released after ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
+            onRightRelease: options.onRightRelease || (() => console.log(`RMB released after ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
+            onBothRelease: options.onBothRelease || (() => console.log(`buttons released after ${(this.HOLD_WINDOW/1000).toFixed(2)} second`)),
             onRmbToLmbCombo: options.onRmbToLmbCombo || ((time) => console.log(`%cRMB then LMB combo detected (${time}ms)`, 'color: #FF0000; font-weight:bold;')),
             onLmbToRmbCombo: options.onLmbToRmbCombo || ((time) => console.log(`%cLMB then RMB combo detected (${time}ms)`, 'color: #0000FF; font-weight:bold;')),
             onLmbToLmbCombo: options.onLmbToLmbCombo || ((time) => console.log(`%cLMB then LMB combo detected (${time}ms)`, 'color: #000000; background-color: #FFFFFF; font-weight:bold;')),
@@ -53,7 +58,8 @@ class MouseGameAPI {
         this.hasLoggedBothHold = false;
         this.lastButtonPressed = null;
         this.lastButtonPressTime = 0;
-        this.COMBO_WINDOW = 400;
+        this.COMBO_WINDOW = options.comboThreshold || 350;
+        this.HOLD_WINDOW = options.holdThreshold || 1000;
 
         // Bind event handlers
         this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -98,7 +104,7 @@ class MouseGameAPI {
                 this.callbacks.onRmbToLmbCombo(currentTime - this.lastButtonPressTime);
                 this.bothMouseDownTime = currentTime;
             }
-            // Check for LMB -> LMB combo (double click)
+            // Check for LMB -> LMB combo
             else if (this.config.enabledLmbToLmbCombo && 
                     this.lastButtonPressed === 'left' && 
                     currentTime - this.lastButtonPressTime < this.COMBO_WINDOW) {
@@ -141,7 +147,7 @@ class MouseGameAPI {
             if (!this.hasLoggedLeftHold && currentTime - this.leftMouseDownTime < 150) {
                 this.callbacks.onLeftTap();
             }
-            if (currentTime - this.leftMouseDownTime >= 1000 && this.hasLoggedLeftHold) {
+            if (currentTime - this.leftMouseDownTime >= this.HOLD_WINDOW && this.hasLoggedLeftHold) {
                 this.callbacks.onLeftRelease();
             }
         } else if (event.button === 2) { // Right mouse button
@@ -149,14 +155,14 @@ class MouseGameAPI {
             if (!this.hasLoggedRightHold && currentTime - this.rightMouseDownTime < 150) {
                 this.callbacks.onRightTap();
             }
-            if (currentTime - this.rightMouseDownTime >= 1000 && this.hasLoggedRightHold) {
+            if (currentTime - this.rightMouseDownTime >= this.HOLD_WINDOW && this.hasLoggedRightHold) {
                 this.callbacks.onRightRelease();
             }
         }
         
         if (!this.isLeftMouseDown && !this.isRightMouseDown) {
             this.hasLoggedBothHold = false;
-            if (currentTime - this.bothMouseDownTime >= 1000 && this.hasLoggedBothHold) {
+            if (currentTime - this.bothMouseDownTime >= this.HOLD_WINDOW && this.hasLoggedBothHold) {
                 this.callbacks.onBothRelease();
             }
         }
@@ -171,19 +177,19 @@ class MouseGameAPI {
         const currentTime = Date.now();
         
         if (this.isLeftMouseDown && !this.isRightMouseDown && 
-            currentTime - this.leftMouseDownTime >= 1000 && !this.hasLoggedLeftHold) {
+            currentTime - this.leftMouseDownTime >= this.HOLD_WINDOW && !this.hasLoggedLeftHold) {
             this.callbacks.onLeftHold();
             this.hasLoggedLeftHold = true;
         }
         
         if (this.isRightMouseDown && !this.isLeftMouseDown && 
-            currentTime - this.rightMouseDownTime >= 1000 && !this.hasLoggedRightHold) {
+            currentTime - this.rightMouseDownTime >= this.HOLD_WINDOW && !this.hasLoggedRightHold) {
             this.callbacks.onRightHold();
             this.hasLoggedRightHold = true;
         }
         
         if (this.isLeftMouseDown && this.isRightMouseDown && 
-            currentTime - this.bothMouseDownTime >= 1000 && !this.hasLoggedBothHold) {
+            currentTime - this.bothMouseDownTime >= this.HOLD_WINDOW && !this.hasLoggedBothHold) {
             this.callbacks.onBothHold();
             this.hasLoggedBothHold = true;
         }

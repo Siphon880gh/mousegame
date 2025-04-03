@@ -64,6 +64,63 @@ const mouseGame = new MouseGameAPI({
 
 If you have different mouse event handlers for different parts of your app or game, you could initiate different instances of MouseGameAPI each with checkEnabled that passes true when appropriate.
 
+
+---
+
+## Combo Threshold Override
+
+Combo threshold defaults to 350ms unless overridden by comboThreshold
+
+Had we set the comboTreshold to 2000
+```
+// Initialize the game
+const mouseGame = new MouseGameAPI({
+    comboThreshold: 2000
+});
+mouseGame.init();
+```
+
+Left click then right click will trigger a LMB->RMB event as long as your quick successions are within 2 seconds (because you’ve set 2000ms). The default if you haven’t set the comboThreshold would be a much more reasonable 350ms because usually it’s a quick succession of mouse clicks that you want to trigger the event (and a slow succession of mouse clicks you probably want to trigger as two individual events in your game / app).
+```
+engine.js:45 LMB tapped
+engine.js:45 LMB then RMB combo detected (1650ms)
+engine.js:37 RMB tapped
+engine.js:44 RMB then LMB combo detected (940ms)
+engine.js:36 LMB tapped
+engine.js:45 LMB then RMB combo detected (1560ms)
+engine.js:37 RMB tapped
+```
+
+
+---
+
+## Hold Threshold Override
+
+Hold threshold defaults to 1000ms unless overridden by holdThreshold. It’s the amount of time needed to register holding LMB or RMB for hold trigger or hold-and-release trigger.
+
+Had we set the holdTreshold to 3000
+```
+// Initialize the game
+const mouseGame = new MouseGameAPI({
+    holdThreshold: 3000
+});
+mouseGame.init();
+```
+
+Holding either the LMB or the RMB doesn’t trigger the “holding” event until your held for a full 3 seconds (because you’ve set 2000ms). Letting go of the mouse click will trigger the “released” event as long as you’ve held on the mouse button passed 3 seconds. The default if you haven’t set the comboThreshold would be a much more reasonable 1 second because that 1 second. could be perceived as a long time to the user (and normal click events mean the mouse click is released at fractions of a second).
+
+- If held LMB for 4 seconds and released:
+    ```
+    engine.js:41 LMB held for 3.00 second
+    engine.js:41 LMB released after 4.00 second
+    ```
+
+- If held LMB for 1 seconds and released, for our overridden example, there is no event or console log. It won’t even register as a single LMB click.
+
+
+---
+
+
 ## Complied with Apple Mac Limitations
 
 Mac has a serious limitation where if you press both LMB and RMB, it cannot detect that both are being pressed. The reason why is that Apple never cared to adapt their mouse events to the mouse. The Mac trackpad is either one click for LMB or two finger click for RMB.

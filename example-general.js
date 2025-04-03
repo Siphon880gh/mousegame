@@ -14,9 +14,8 @@
 //     enabledRmbToRmbCombo: false,
 // });
 
-const mouseGame = new MouseGameAPI();
-
 // Initialize the game
+const mouseGame = new MouseGameAPI();
 mouseGame.init();
 
 // To destroy/cleanup:
